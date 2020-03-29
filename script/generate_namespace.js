@@ -17,6 +17,7 @@ export interface ResponseObject<T> extends BaseResponseObject<T> {
   statusCode: number,
   toJSON(): BaseResponseObject<T>;
   toString(): string;
+  to<V>(transform: TransformFunction<BaseResponseObject<T>, V>): V;
 }
 
 export interface ErrorResponseObject<T> extends ResponseObject<T>, Error {}
@@ -36,7 +37,13 @@ function toString(this: {status: number}) {
   return \`Responses.\${getName(this.status)} \${JSON.stringify(this)}\`;
 }`;
 
-const protoCode = "const proto: ResponseObject<undefined> = { toJSON, toString, body: undefined, status: 0, statusCode: 0, headers: {} };";
+const toTransformFunc = `
+type TransformFunction<U, V> = (input: U) => V;
+function to<V>(this: {body: any, status: number, headers: Headers}, transform: TransformFunction<{body: any, status: number, headers: Headers}, V>): V {
+  return transform.bind(this)();
+}`;
+
+const protoCode = "const proto: ResponseObject<undefined> = { toJSON, toString, to, body: undefined, status: 0, statusCode: 0, headers: {} };";
 
 const errProtoCode = "const errProto: ErrorResponseObject<undefined> = Object.assign(Object.create(Error.prototype), proto);";
 
@@ -127,6 +134,7 @@ const chunks = [
   createWeakSet,
   toJSON,
   toString,
+  toTransformFunc,
   protoCode,
   errProtoCode,
   types,

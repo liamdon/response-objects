@@ -1,3 +1,4 @@
+declare type TransformFunction<U, V> = (input: U) => V;
 export interface BaseResponseObject<T> {
     readonly body: T;
     readonly status: number;
@@ -7,6 +8,7 @@ export interface ResponseObject<T> extends BaseResponseObject<T> {
     statusCode: number;
     toJSON(): BaseResponseObject<T>;
     toString(): string;
+    to<V>(transform: TransformFunction<BaseResponseObject<T>, V>): V;
 }
 export interface ErrorResponseObject<T> extends ResponseObject<T>, Error {
 }

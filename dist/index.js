@@ -9,7 +9,10 @@ function toJSON() {
 function toString() {
     return `Responses.${getName(this.status)} ${JSON.stringify(this)}`;
 }
-const proto = { toJSON, toString, body: undefined, status: 0, statusCode: 0, headers: {} };
+function to(transform) {
+    return transform.bind(this)();
+}
+const proto = { toJSON, toString, to, body: undefined, status: 0, statusCode: 0, headers: {} };
 const errProto = Object.assign(Object.create(Error.prototype), proto);
 function R(code, body, headers = {}) {
     if (responses.has(body))
