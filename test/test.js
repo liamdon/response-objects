@@ -62,6 +62,13 @@ Object.keys(STATUS_CODES)
         expect(resp.toString()).toEqual(`Responses.${Name} ${JSON.stringify(resp)}`);
       });
 
+      it("to(transformFunc) works", function () {
+        const transformFunc = function(input) {
+          return `custom: ${input.status}`;
+        };
+        expect(resp.to(transformFunc)).toEqual(`custom: ${resp.status}`);
+      });
+
       it("can receive body argument", function () {
         expect(Ctor("custom body").body).toBe("custom body");
       });
